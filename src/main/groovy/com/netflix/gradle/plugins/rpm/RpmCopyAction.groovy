@@ -53,6 +53,10 @@ class RpmCopyAction extends AbstractPackagingCopyAction<Rpm> {
         super.startVisit(action)
 
         assert task.getVersion() != null, 'RPM requires a version string'
+        if ([task.preInstallFile, task.postInstallFile, task.preUninstallFile, task.postUninstallFile].any()) {
+            logger.warn('At least one of (preInstallFile|postInstallFile|preUninstallFile|postUninstallFile) is defined ' +
+                    'and will be ignored for RPM builds')
+        }
 
         builder = new Builder()
         builder.setPackage task.packageName, task.version, task.release, task.epoch
@@ -89,6 +93,9 @@ class RpmCopyAction extends AbstractPackagingCopyAction<Rpm> {
         builder.setPostInstallScript(scriptWithUtils(task.allCommonCommands, task.allPostInstallCommands))
         builder.setPreUninstallScript(scriptWithUtils(task.allCommonCommands, task.allPreUninstallCommands))
         builder.setPostUninstallScript(scriptWithUtils(task.allCommonCommands, task.allPostUninstallCommands))
+        builder.setPreTransScript(scriptWithUtils(task.allCommonCommands, task.allPreTransCommands))
+        builder.setPostTransScript(scriptWithUtils(task.allCommonCommands, task.allPostTransCommands))
+
 
         rpmFileVisitorStrategy = new RpmFileVisitorStrategy(builder)
     }

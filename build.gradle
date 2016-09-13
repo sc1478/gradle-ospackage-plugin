@@ -15,23 +15,11 @@
  *
  */
 
-buildscript { repositories { jcenter() } } // Some plugin dependencies (namely JFrog) are not in Maven Central
 
 plugins {
-    id 'groovy'
-    id 'idea'
-    id 'jacoco'
-    id 'nebula.info' version '3.0.3'
-    id 'nebula.contacts' version '3.0.1'
-    id 'nebula.maven-publish' version '4.4.4'
-    id 'nebula.nebula-release' version '3.1.2'
-    id 'nebula.nebula-bintray' version '3.1.0'
-    id 'com.gradle.plugin-publish' version '0.9.3'
-    id 'nebula.javadoc-jar' version '4.4.4'
-    id 'nebula.source-jar' version '4.4.4'
-    id 'nebula.test-jar' version '4.4.4'
-    id 'nebula.maven-apache-license' version '4.4.4'
-    id 'com.github.kt3k.coveralls' version '2.4.0'
+    id 'com.gradle.plugin-publish' version '0.9.5'
+    id 'nebula.plugin-plugin' version '4.24.2'
+    id 'nebula.test-jar' version '4.7.0'
 }
 
 description 'Provides a task similar to Tar and Zip for constructing RPM and DEB package files.'
@@ -51,8 +39,6 @@ contacts {
     }
 }
 
-apply from: 'https://raw.githubusercontent.com/nebula-plugins/nebula-core/b676bbc026d0053494b5439ba8ef147c16adabba/common.gradle'
-
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.1'
     compile('org.redline-rpm:redline:1.2.2') {
@@ -68,7 +54,7 @@ dependencies {
         exclude group: 'org.codehaus.plexus', module: 'plexus-utils'
     }
 
-    compile 'com.bmuschko:gradle-docker-plugin:2.0.3'
+    compile 'com.bmuschko:gradle-docker-plugin:3.0.1'
 }
 
 def javaApiUrl = 'http://docs.oracle.com/javase/1.6.0/docs/api/'
@@ -78,7 +64,7 @@ tasks.withType(Javadoc) {
 }
 
 test {
-    maxHeapSize = '700m'
+    maxHeapSize = '384m'
 }
 
 pluginBundle {
@@ -90,11 +76,32 @@ pluginBundle {
             tags = ['nebula', 'rpm', 'centos', 'deb', 'debian']
         }
 
+        ospackageApplication {
+            id = 'nebula.ospackage-application'
+            displayName = 'Nebula OS Package Application Plugin'
+            description = 'Packages output of application plugin into a debian or rpm'
+            tags = ['nebula', 'os', 'package', 'rpm', 'deb', 'application']
+        }
+
+        ospackageApplicationDaemon {
+            id = 'nebula.ospackage-application-daemon'
+            displayName = 'Nebula OS Package Application Daemon Plugin'
+            description = 'Creates daemontools setup to run output from application plugin'
+            tags = ['nebula', 'os', 'package', 'rpm', 'deb', 'application', 'daemon']
+        }
+
         ospackageBase {
             id = 'nebula.ospackage-base'
             displayName = 'Nebula OS Package Base'
             description = 'Setup base publishing for OS packages'
             tags = ['nebula', 'rpm', 'centos', 'deb', 'debian']
+        }
+
+        ospackageDaemon {
+            id = 'nebula.ospackage-daemon'
+            displayName = 'Nebula OS Package Daemon Plugin'
+            description = 'Create daemontools runner'
+            tags = ['nebula', 'os', 'package', 'rpm', 'deb', 'daemon']
         }
 
         ospackageDocker {

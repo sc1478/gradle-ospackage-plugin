@@ -1,11 +1,37 @@
-3.4.0 / 2015-01-25
+3.7.0 / 2016-08-03
 ------------------
 
-* Added directory capability for debs via https://github.com/bi-
-* Added signing for debs via [Damian Johnson](https://github.com/dmnjohns)
-* move to gradle 2.10
+* Allow defining complete maintainer scripts for debians
 
-3.3.0 / 2015-01-18
+3.6.1 / 2016-06-01
+------------------
+
+* Publish a test jar
+
+3.6.0 / 2016-05-31
+------------------
+
+* nebula-ospackage-plugin plugins have been migrated to this plugin
+* Support for dependency alternatives (contributed by @mxwell)
+* Link class now works correctly as a task input, avoiding UP-TO-DATE when stale issues 
+  (contributed by @simplivity)
+* Minor fix to RPM documentation (contributed by @ahadas)
+
+3.5.0 / 2016-04-15
+------------------
+
+* Added missing required() method (contribution by @wallner)
+* Added preTrans and postTrans for RPM packages (contribution by @dwendelen)
+* Update to Gradle 2.12
+
+3.4.0 / 2016-01-25
+------------------
+
+* Added directory capability for debs (contribution by @bi-)
+* Added signing for debs (contribution by @dmnjohns)
+* Update to gradle 2.10
+
+3.3.0 / 2016-01-18
 ------------------
 * Make `provides` accept multiple values
 

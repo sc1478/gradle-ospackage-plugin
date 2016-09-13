@@ -212,6 +212,46 @@ class DebPluginTest extends ProjectSpec {
 
     }
 
+    def 'specify complete maintainer scripts'() {
+        given:
+        project.version = 1.0
+        File srcDir = new File(projectDir, 'src')
+        srcDir.mkdirs()
+        def customPreInst = new File(srcDir, 'some-preinst-file.py')
+        def customPreInstContents = '#!/usr/bin/env python3\nprint("Installing...")'
+        FileUtils.writeStringToFile(customPreInst, customPreInstContents)
+
+        def customPostInst = new File(srcDir, 'some-postinst-file.py')
+        def customPostInstContents = '#!/usr/bin/env python\nprint "Installed"'
+        FileUtils.writeStringToFile(customPostInst, customPostInstContents)
+
+        def customPreRm = new File(srcDir, 'some-prerm-file.sh')
+        def customPreRmContents = '#!/bin/bash \necho "Removing..."'
+        FileUtils.writeStringToFile(customPreRm, customPreRmContents)
+
+        def customPostRm = new File(srcDir, 'some-postrm-file.rb')
+        def customPostRmContents = '#!/usr/bin/env ruby\nputs "Uninstallation Completed." '
+        FileUtils.writeStringToFile(customPostRm, customPostRmContents)
+
+        project.apply plugin: 'nebula.deb'
+        Deb debTask = (Deb) project.task([type: Deb], 'buildDeb', {
+            preInstallFile customPreInst
+            postInstallFile customPostInst
+            preUninstallFile customPreRm
+            postUninstallFile customPostRm
+        })
+
+        when:
+        debTask.execute()
+
+        then:
+        def scan = new Scanner(debTask.getArchivePath())
+        scan.controlContents['./preinst'].contains(customPreInstContents)
+        scan.controlContents['./postinst'].contains(customPostInstContents)
+        scan.controlContents['./prerm'].contains(customPreRmContents)
+        scan.controlContents['./postrm'].contains(customPostRmContents)
+    }
+
     def 'generateScripts'() {
         project.version = 1.0
 
@@ -1061,6 +1101,22 @@ class DebPluginTest extends ProjectSpec {
             requires('test')
         }
         taskA.getAllDependencies() == taskB.getAllDependencies()
+    }
+
+    def 'add alternative dependencies' () {
+        given:
+        project.apply plugin: 'nebula.deb'
+        Deb debTask = project.task('buildDeb', type: Deb) {
+            requires('depA', '1.0').or('depB', '2.0', Flags.GREATER | Flags.EQUAL)
+            requires('depC', '3.0').or('depD')
+        }
+
+        when:
+        debTask.execute()
+
+        then:
+        def scan = new Scanner(debTask.archivePath)
+        'depA (1.0) | depB (>= 2.0), depC (3.0) | depD' ==  scan.getHeaderEntry('Depends')
     }
 
     @Issue("")
